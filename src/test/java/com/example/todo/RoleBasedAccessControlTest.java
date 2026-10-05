@@ -240,11 +240,18 @@ class RoleBasedAccessControlTest {
     }
 
     @Test
-    @DisplayName("توکن بدون پیشوند Bearer طبق RFC 6750 پذیرفته نمی‌شود")
-    void tokenWithoutBearerScheme_isRejected() throws Exception {
+    @DisplayName("توکن بدون پیشوند Bearer هم پذیرفته می‌شود")
+    void tokenWithoutBearerScheme_isAccepted() throws Exception {
         String token = login(userName, EnumSet.of(Role.USER));
 
         mockMvc.perform(get("/api/todos").header("Authorization", token))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    @DisplayName("هدر Authorization با مقدار بی‌ربط نادیده گرفته می‌شود")
+    void nonJwtAuthorizationHeader_isRejected() throws Exception {
+        mockMvc.perform(get("/api/todos").header("Authorization", "Basic dXNlcjpwYXNz"))
                 .andExpect(status().isUnauthorized());
     }
 

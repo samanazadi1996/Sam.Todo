@@ -69,32 +69,41 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     }
 
     /**
-     * Per RFC 6750 only the Bearer scheme is honoured, and the scheme is case-insensitive
-     * (RFC 7235). Clients such as Swagger UI also copy the raw value including the scheme into
-     * the Authorize dialog, producing "Bearer Bearer <token>", so a repeated prefix is stripped
-     * as well. A JWT itself never contains whitespace.
-     */
-    private String resolveToken(HttpServletRequest request) {
+     * Accepts both {@code Authorization: Bearer <jwt>} and a bare {@code Authorization: <jwt>}, since
+     * the header is frequently filled in by hand. The scheme is matched case-insensitively
+     * (RFC 7235) and a repeated {@code Bearer} prefix is stripped, because Swagger UI copies the raw
+     * value including the scheme into its Authorize dialog. Only values shaped like a JWS (three
+     * non-empty segments) are treated as credentials; anything else is ignored so the request
+ * * fails with 401.
+ */
+private String resolveToken(HttpServletRequest request) {
         String header = request.getHeader(AUTHORIZATION_HEADER);
         if (header == null) {
             return null;
         }
 
         String token = header.trim();
-        if (!hasBearerScheme(token)) {
-            return null;
-        }
-
         while (hasBearerScheme(token)) {
             token = token.substring(BEARER_SCHEME.length()).trim();
         }
 
-        return token.isEmpty() ? null : token;
+        return isJwsShaped(token) ? token : null;
     }
 
     private boolean hasBearerScheme(String value) {
         return value.length() > BEARER_SCHEME.length()
                 && value.regionMatches(true, 0, BEARER_SCHEME, 0, BEARER_SCHEME.length())
                 && Character.isWhitespace(value.charAt(BEARER_SCHEME.length()));
+    }
+
+    private boolean isJwsShaped(String value) {
+        int firstDot = value.indexOf('.');
+        if (firstDot <= 0) {
+            return false;
+        }
+        int secondDot = value.indexOf('.', firstDot + 1);
+        return secondDot > firstDot + 1
+                && secondDot < value.length() - 1
+                && value.indexOf('.', secondDot + 1) < 0;
     }
 }
