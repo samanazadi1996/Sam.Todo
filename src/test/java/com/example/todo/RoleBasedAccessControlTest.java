@@ -3,6 +3,7 @@ package com.example.todo;
 import com.example.todo.entity.AppUser;
 import com.example.todo.entity.Role;
 import com.example.todo.repository.AppUserRepository;
+import com.example.todo.repository.TodoItemRepository;
 import com.example.todo.security.JwtService;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
@@ -21,6 +22,7 @@ import org.springframework.test.web.servlet.MvcResult;
 import tools.jackson.databind.ObjectMapper;
 
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.Base64;
 import java.util.Date;
 import java.util.EnumSet;
@@ -51,6 +53,9 @@ class RoleBasedAccessControlTest {
     private AppUserRepository userRepository;
 
     @Autowired
+    private TodoItemRepository todoItemRepository;
+
+    @Autowired
     private PasswordEncoder passwordEncoder;
 
     @Value("${app.jwt.secret}")
@@ -58,6 +63,7 @@ class RoleBasedAccessControlTest {
 
     private String userName;
     private String adminName;
+    private final List<Long> createdTodoIds = new ArrayList<>();
 
     @BeforeEach
     void setUp() {
@@ -68,6 +74,8 @@ class RoleBasedAccessControlTest {
 
     @AfterEach
     void tearDown() {
+        todoItemRepository.findAllById(createdTodoIds).forEach(todoItemRepository::delete);
+        createdTodoIds.clear();
         userRepository.findAll().stream()
                 .filter(user -> user.getUsername().equals(userName) || user.getUsername().equals(adminName))
                 .forEach(userRepository::delete);
@@ -141,11 +149,14 @@ class RoleBasedAccessControlTest {
         mockMvc.perform(get("/api/todos").header("Authorization", bearer(token)))
                 .andExpect(status().isOk());
 
-        mockMvc.perform(post("/api/todos")
+        MvcResult created = mockMvc.perform(post("/api/todos")
                         .header("Authorization", bearer(token))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{\"title\":\"کار تست\",\"completed\":false}"))
-                .andExpect(status().isCreated());
+                .andExpect(status().isCreated())
+                .andReturn();
+
+        createdTodoIds.add(objectMapper.readTree(created.getResponse().getContentAsString()).get("id").asLong());
     }
 
     @Test
@@ -293,7 +304,9 @@ class RoleBasedAccessControlTest {
                 .andExpect(status().isCreated())
                 .andReturn();
 
-        return objectMapper.readTree(result.getResponse().getContentAsString()).get("id").asLong();
+        Long id = objectMapper.readTree(result.getResponse().getContentAsString()).get("id").asLong();
+        createdTodoIds.add(id);
+        return id;
     }
 
     private void createUser(String username, EnumSet<Role> roles) {

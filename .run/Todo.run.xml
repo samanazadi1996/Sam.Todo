@@ -1,0 +1,11 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="Todo" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot">
+    <module name="todo" />
+    <option name="SPRING_BOOT_MAIN_CLASS" value="com.example.todo.TodoApplication" />
+    <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+    <shortenClasspath name="NONE" />
+    <method v="2">
+      <option name="Make" enabled="true" />
+    </method>
+  </configuration>
+</component>
