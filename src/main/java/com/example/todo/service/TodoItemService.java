@@ -17,4 +17,8 @@ public interface TodoItemService {
     TodoResponse getById(Long id);
 
     List<TodoResponse> getAll();
+
+    List<TodoResponse> getAll(Boolean completed);
+
+    List<TodoResponse> getAll(Boolean completed, String title);
 }

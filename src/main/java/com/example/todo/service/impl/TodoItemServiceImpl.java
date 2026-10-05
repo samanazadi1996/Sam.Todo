@@ -27,7 +27,7 @@ public class TodoItemServiceImpl implements TodoItemService {
         TodoItem item = new TodoItem();
         item.setTitle(request.getTitle());
         item.setDescription(request.getDescription());
-        item.setCompleted(request.isCompleted());
+        item.setCompleted(request.getCompleted());
         return new TodoResponse(repository.save(item));
     }
 
@@ -38,7 +38,7 @@ public class TodoItemServiceImpl implements TodoItemService {
                 .orElseThrow(() -> new ResourceNotFoundException("Todo با شناسه " + id + " یافت نشد"));
         item.setTitle(request.getTitle());
         item.setDescription(request.getDescription());
-        item.setCompleted(request.isCompleted());
+        item.setCompleted(request.getCompleted());
         return new TodoResponse(repository.save(item));
     }
 
@@ -61,7 +61,19 @@ public class TodoItemServiceImpl implements TodoItemService {
     @Override
     @Transactional(readOnly = true)
     public List<TodoResponse> getAll() {
-        return repository.findAll().stream()
+        return getAll(null, null);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<TodoResponse> getAll(Boolean completed) {
+        return getAll(completed, null);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<TodoResponse> getAll(Boolean completed, String title) {
+        return repository.findByFilters(completed, title).stream()
                 .map(TodoResponse::new)
                 .toList();
     }

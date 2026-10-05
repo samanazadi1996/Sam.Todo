@@ -9,7 +9,7 @@ public class TodoResponse {
     private Long id;
     private String title;
     private String description;
-    private boolean completed;
+    private Boolean completed;
     private LocalDateTime createdAt;
 
     public TodoResponse() {
@@ -19,7 +19,7 @@ public class TodoResponse {
         this.id = item.getId();
         this.title = item.getTitle();
         this.description = item.getDescription();
-        this.completed = item.isCompleted();
+        this.completed = item.getCompleted();
         this.createdAt = item.getCreatedAt();
     }
 
@@ -47,11 +47,11 @@ public class TodoResponse {
         this.description = description;
     }
 
-    public boolean isCompleted() {
+    public Boolean getCompleted() {
         return completed;
     }
 
-    public void setCompleted(boolean completed) {
+    public void setCompleted(Boolean completed) {
         this.completed = completed;
     }
 

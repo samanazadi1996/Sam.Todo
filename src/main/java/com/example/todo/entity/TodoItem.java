@@ -18,14 +18,14 @@ public class TodoItem {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false, length = 255)
+    @Column(nullable = false, length = 255, columnDefinition = "nvarchar(255)")
     private String title;
 
-    @Column(length = 2000)
+    @Column(length = 2000, columnDefinition = "nvarchar(2000)")
     private String description;
 
     @Column(nullable = false)
-    private boolean completed;
+    private Boolean completed;
 
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
@@ -59,11 +59,11 @@ public class TodoItem {
         this.description = description;
     }
 
-    public boolean isCompleted() {
+    public Boolean getCompleted() {
         return completed;
     }
 
-    public void setCompleted(boolean completed) {
+    public void setCompleted(Boolean completed) {
         this.completed = completed;
     }
 

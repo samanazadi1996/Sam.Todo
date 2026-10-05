@@ -12,7 +12,7 @@ public class TodoUpdateRequest {
     @Size(max = 2000, message = "توضیحات حداکثر ۲۰۰۰ کاراکتر باشد")
     private String description;
 
-    private boolean completed;
+    private Boolean completed;
 
     public String getTitle() {
         return title;
@@ -30,11 +30,11 @@ public class TodoUpdateRequest {
         this.description = description;
     }
 
-    public boolean isCompleted() {
+    public Boolean getCompleted() {
         return completed;
     }
 
-    public void setCompleted(boolean completed) {
+    public void setCompleted(Boolean completed) {
         this.completed = completed;
     }
 }
