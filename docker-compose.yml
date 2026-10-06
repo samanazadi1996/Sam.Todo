@@ -1,0 +1,30 @@
+services:
+  todo:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: todo:local
+    container_name: todo
+    ports:
+      - "8080:8080"
+
+    environment:
+      # Only the host has to change: inside a container "localhost" is the
+      # container itself, not the machine running SQL Server.
+      # host.docker.internal works on Docker Desktop; host-gateway maps it on
+      # plain Linux, where that name does not exist by default.
+      SPRING_DATASOURCE_URL: "jdbc:sqlserver://host.docker.internal:1433;databaseName=TodoDb;encrypt=true;trustServerCertificate=true"
+
+      # Everything else (datasource credentials, JWT secret, bootstrap admin)
+      # is read from application.properties. Override these in production:
+      # SPRING_DATASOURCE_USERNAME
+      # SPRING_DATASOURCE_PASSWORD
+      # JWT_SECRET
+      # BOOTSTRAP_ADMIN_PASSWORD
+
+      JAVA_OPTS: "-XX:MaxRAMPercentage=75.0 -Dfile.encoding=UTF-8"
+
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+    restart: unless-stopped

@@ -1,0 +1,28 @@
+# Build output - the image is built from source, never from a local target/
+target/
+
+# VCS and IDE metadata are irrelevant inside the image
+.git/
+.gitattributes
+.gitignore
+.idea/
+.vscode/
+*.iml
+*.iws
+
+# Windows-only native library for MS SQL integrated authentication.
+# The app authenticates with SQL auth (username/password), and a .dll is
+# useless inside a Linux container.
+native/
+
+# Maven wrapper: the builder stage uses the maven: image instead
+mvnw
+mvnw.cmd
+.mvn/
+
+# Docker's own files and local documentation
+Dockerfile
+.dockerignore
+docker-compose.yml
+*.md
+docs/
