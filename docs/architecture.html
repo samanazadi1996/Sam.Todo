@@ -1,0 +1,831 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>معماری فنی پروژه Todo — راهنمای یادگیری</title>
+<style>
+  :root{
+    --bg:#f6f7f9; --card:#ffffff; --ink:#1c2230; --muted:#5b6577;
+    --line:#e2e6ec; --accent:#2f6fb5; --accent-soft:#eaf1f9;
+    --ok:#1d7a4d; --warn:#9a6400; --bad:#b3261e;
+    --code-bg:#1e2430; --code-ink:#e6edf3;
+    --radius:10px;
+  }
+  @media (prefers-color-scheme: dark){
+    :root{
+      --bg:#14181f; --card:#1b212b; --ink:#e7ecf3; --muted:#9aa6b6;
+      --line:#2a323f; --accent:#79b0e8; --accent-soft:#1e2a38;
+      --ok:#5fd08a; --warn:#e0b055; --bad:#f28b82;
+      --code-bg:#0f1319; --code-ink:#e6edf3;
+    }
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0; background:var(--bg); color:var(--ink);
+    font-family:"Segoe UI",Tahoma,"Iranian Sans",system-ui,sans-serif;
+    line-height:1.9; font-size:15px;
+  }
+  .wrap{display:grid; grid-template-columns:270px 1fr; gap:0; max-width:1400px; margin:0 auto}
+  nav{
+    position:sticky; top:0; align-self:start; height:100vh; overflow-y:auto;
+    padding:22px 16px; border-left:1px solid var(--line); background:var(--card);
+  }
+  nav h2{font-size:.85rem; text-transform:none; color:var(--muted); margin:0 0 10px; font-weight:700}
+  nav a{
+    display:block; padding:5px 10px; margin:1px 0; border-radius:6px;
+    color:var(--muted); text-decoration:none; font-size:.9rem; border-right:3px solid transparent;
+  }
+  nav a:hover{background:var(--accent-soft); color:var(--accent)}
+  main{padding:30px 40px 90px; min-width:0}
+  header.top{border-bottom:2px solid var(--line); padding-bottom:18px; margin-bottom:8px}
+  header.top h1{margin:0 0 6px; font-size:1.75rem}
+  header.top p{margin:0; color:var(--muted)}
+  h2.sec{
+    font-size:1.28rem; margin:44px 0 12px; padding-bottom:7px;
+    border-bottom:1px solid var(--line); scroll-margin-top:14px;
+  }
+  h3{font-size:1.05rem; margin:26px 0 8px; color:var(--accent)}
+  h4{font-size:.97rem; margin:18px 0 6px}
+  p{margin:10px 0}
+  ul,ol{margin:10px 0; padding-right:22px}
+  li{margin:5px 0}
+  a{color:var(--accent)}
+  code{
+    background:var(--accent-soft); color:var(--accent); padding:1px 6px;
+    border-radius:4px; font-family:Consolas,"Cascadia Mono",monospace; font-size:.88em;
+    direction:ltr; unicode-bidi:embed; display:inline-block;
+  }
+  pre{
+    background:var(--code-bg); color:var(--code-ink); padding:14px 16px;
+    border-radius:var(--radius); overflow-x:auto; direction:ltr; text-align:left;
+    font-family:Consolas,"Cascadia Mono",monospace; font-size:.83rem; line-height:1.65;
+    border:1px solid var(--line);
+  }
+  pre code{background:none; color:inherit; padding:0; font-size:inherit; display:inline}
+  table{width:100%; border-collapse:collapse; margin:14px 0; font-size:.9rem}
+  th,td{border:1px solid var(--line); padding:8px 10px; text-align:right; vertical-align:top}
+  th{background:var(--accent-soft); font-weight:700}
+  td.l,th.l{direction:ltr; text-align:left; font-family:Consolas,monospace; font-size:.85rem}
+  .card{background:var(--card); border:1px solid var(--line); border-radius:var(--radius); padding:14px 18px; margin:14px 0}
+  .note{border-right:4px solid var(--accent); background:var(--accent-soft); padding:10px 14px; border-radius:8px; margin:14px 0}
+  .warn{border-right:4px solid var(--warn); background:color-mix(in srgb, var(--warn) 10%, transparent); padding:10px 14px; border-radius:8px; margin:14px 0}
+  .bad{border-right:4px solid var(--bad); background:color-mix(in srgb, var(--bad) 10%, transparent); padding:10px 14px; border-radius:8px; margin:14px 0}
+  .ok{border-right:4px solid var(--ok); background:color-mix(in srgb, var(--ok) 10%, transparent); padding:10px 14px; border-radius:8px; margin:14px 0}
+  .tag{display:inline-block; padding:1px 8px; border-radius:20px; font-size:.76rem; border:1px solid var(--line); background:var(--card); color:var(--muted)}
+  .grid2{display:grid; grid-template-columns:repeat(auto-fit,minmax(230px,1fr)); gap:12px; margin:14px 0}
+  .grid2 .card{margin:0}
+  .flow{background:var(--card); border:1px solid var(--line); border-radius:var(--radius); padding:14px; direction:ltr; text-align:left; font-family:Consolas,monospace; font-size:.8rem; line-height:1.9; overflow-x:auto}
+  .badge{font-size:.72rem; padding:1px 7px; border-radius:4px; background:var(--accent); color:#fff; margin-right:6px}
+  .muted{color:var(--muted)}
+  footer{margin-top:50px; padding-top:16px; border-top:1px solid var(--line); color:var(--muted); font-size:.85rem}
+  @media (max-width:900px){
+    .wrap{grid-template-columns:1fr}
+    nav{position:static; height:auto; border-left:none; border-bottom:1px solid var(--line)}
+    main{padding:20px}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+<nav>
+  <h2>فهرست مطالب</h2>
+  <a href="#intro">۱. نمای کلی</a>
+  <a href="#stack">۲. تکنولوژی‌ها و نسخه‌ها</a>
+  <a href="#structure">۳. ساختار پوشه‌ها</a>
+  <a href="#layers">۴. معماری لایه‌ای</a>
+  <a href="#flow">۵. جریان یک درخواست</a>
+  <a href="#entity">۶. لایه Entity</a>
+  <a href="#repo">۷. لایه Repository</a>
+  <a href="#service">۸. لایه Service</a>
+  <a href="#controller">۹. لایه Controller</a>
+  <a href="#dto">۱۰. لایه DTO</a>
+  <a href="#exception">۱۱. مدیریت خطا</a>
+  <a href="#security">۱۲. امنیت و احراز هویت</a>
+  <a href="#jwt">۱۳. JWT چطور کار می‌کند</a>
+  <a href="#filterchain">۱۴. زنجیره فیلترها</a>
+  <a href="#rbac">۱۵. کنترل دسترسی بر پایه نقش</a>
+  <a href="#filtervsinterceptor">۱۶. Filter در برابر Interceptor</a>
+  <a href="#config">۱۷. کلاس‌های پیکربندی</a>
+  <a href="#db">۱۸. دیتابیس</a>
+  <a href="#api">۱۹. مرجع API</a>
+  <a href="#props">۲۰. تنظیمات</a>
+  <a href="#tests">۲۱. تست‌ها</a>
+  <a href="#docker">۲۲. Docker</a>
+  <a href="#debt">۲۳. بدهی‌های فنی</a>
+</nav>
+
+<main>
+<header class="top">
+  <h1>معماری فنی پروژه Todo</h1>
+  <p>سندی برای یادگیری: ساختار، لایه‌ها، جریان درخواست، امنیت و تکنولوژی‌های به‌کاررفته</p>
+  <p class="muted" style="font-size:.85rem">مستند بر اساس کد واقعی مخزن <code>Sam.Todo</code> نوشته شده است.</p>
+</header>
+
+<h2 class="sec" id="intro">۱. نمای کلی</h2>
+<p>
+این پروژه یک REST API برای مدیریت وظایف (Todo) با احراز هویت مبتنی بر نقش است. کاربر می‌تواند
+ثبت‌نام کند، وارد شود، توکن بگیرد و با آن وظایف را بخواند یا بسازد. عملیات حساس‌تر مثل
+ویرایش، حذف و مدیریت کاربران فقط برای نقش <code>ADMIN</code> است.
+</p>
+<div class="grid2">
+  <div class="card"><strong>سبک معماری</strong><br><span class="muted">لایه‌ای (Layered) با پروژکتور به سمت دامنه</span></div>
+  <div class="card"><strong>سبک احراز هویت</strong><br><span class="muted">بی‌حالت (Stateless) با JWT</span></div>
+  <div class="card"><strong>پایگاه داده</strong><br><span class="muted">Microsoft SQL Server</span></div>
+  <div class="card"><strong>دسترسی پایگاه داده</strong><br><span class="muted">JPA / Hibernate</span></div>
+</div>
+
+<h2 class="sec" id="stack">۲. تکنولوژی‌ها و نسخه‌ها</h2>
+<table>
+<thead><tr><th>دسته</th><th>فناوری</th><th class="l">نسخه</th><th>نقش در پروژه</th></tr></thead>
+<tbody>
+<tr><td>زبان</td><td>Java</td><td class="l">26</td><td>زبان اصلی؛ سطح زبان از record و عبارت‌های switch تا API جدید JDK استفاده می‌کند</td></tr>
+<tr><td>فریم‌ورک</td><td>Spring Boot</td><td class="l">4.1.1</td><td>پایه برنامه، پیکربندی خودکار، ساخت سرور</td></tr>
+<tr><td>وب</td><td>spring-boot-starter-webmvc</td><td class="l">4.1.1</td><td>Spring MVC، سرور داخلی، تبدیل JSON</td></tr>
+<tr><td>وب</td><td>Spring Framework</td><td class="l">7.0.9</td><td>هسته Spring (spring-web, spring-webmvc, spring-context)</td></tr>
+<tr><td>امنیت</td><td>spring-boot-starter-security</td><td class="l">4.1.1</td><td>لایه امنیتی</td></tr>
+<tr><td>امنیت</td><td>Spring Security</td><td class="l">7.1.1</td><td>زنجیره فیلتر، کنترل دسترسی، رمزنگاری</td></tr>
+<tr><td>توکن</td><td>JJWT</td><td class="l">0.13.0</td><td>ساخت و اعتبارسنجی JWT (HS256)</td></tr>
+<tr><td>دسترسی داده</td><td>spring-boot-starter-data-jpa</td><td class="l">4.1.1</td><td>Spring Data JPA</td></tr>
+<tr><td>دسترسی داده</td><td>Hibernate ORM</td><td class="l">7.4.5.Final</td><td>نگاشت شیء به رابطه</td></tr>
+<tr><td>اعتبارسنجی</td><td>spring-boot-starter-validation</td><td class="l">4.1.1</td><td>اعتبارسنجی Bean با Jakarta Validation</td></tr>
+<tr><td>اعتبارسنجی</td><td>Hibernate Validator</td><td class="l">9.1.3.Final</td><td>پیاده‌سازی <code>@NotBlank</code> و مشابه</td></tr>
+<tr><td>پایگاه داده</td><td>MS SQL Server (mssql-jdbc)</td><td class="l">13.4.0.jre11</td><td>درایور JDBC</td></tr>
+<tr><td>اتصال</td><td>HikariCP</td><td class="l">7.0.2</td><td>استخر اتصال</td></tr>
+<tr><td>سرور</td><td>Apache Tomcat (embed)</td><td class="l">11.0.24</td><td>سرور داخلی اپلیکیشن</td></tr>
+<tr><td>JSON</td><td>Jackson 3 (<code>tools.jackson</code>)</td><td class="l">3.1.5</td><td>سریال‌سازی پاسخ‌ها در Spring Boot 4</td></tr>
+<tr><td>JSON</td><td>Jackson 2 (<code>com.fasterxml</code>)</td><td class="l">2.21.5</td><td>فقط برای JJWT؛ با Jackson 3 هم‌زیستی دارد</td></tr>
+<tr><td>مستندسازی</td><td>springdoc-openapi</td><td class="l">3.1.0</td><td>تولید خودکار مستند OpenAPI</td></tr>
+<tr><td>مستندسازی</td><td>Swagger UI</td><td class="l">5.32.11</td><td>رابط تست API در مرورگر</td></tr>
+<tr><td>لاگ</td><td>Logback</td><td class="l">1.5.38</td><td>ثبت رویداد</td></tr>
+<tr><td>توسعه</td><td>spring-boot-devtools</td><td class="l">4.1.1</td><td>راه‌اندازی مجدد خودکار؛ فقط در حالت توسعه</td></tr>
+<tr><td>تست</td><td>spring-boot-starter-webmvc-test</td><td class="l">4.1.1</td><td>زیرساخت تست</td></tr>
+<tr><td>تست</td><td>spring-security-test</td><td class="l">7.1.1</td><td>ابزار تست امنیت</td></tr>
+<tr><td>تست</td><td>JUnit Platform</td><td class="l">6.0.3</td><td>اجرای تست</td></tr>
+<tr><td>تست</td><td>AssertJ / Mockito</td><td class="l">—</td><td>assertion و mock</td></tr>
+<tr><td>ساخت</td><td>Apache Maven</td><td class="l">3.9.16</td><td>مدیریت وابستگی و build</td></tr>
+</tbody>
+</table>
+<div class="note">
+<strong>نکته مهم درباره نسخه‌ها:</strong> این پروژه روی نسخه‌های بسیار جدید ساخته شده است.
+<code>Spring Boot 4</code> سرآغاز‌ها (starters) را بازنام‌گذاری کرده و
+<code>spring-boot-starter-web</code> به <code>spring-boot-starter-webmvc</code> تبدیل شده است.
+همچنین <strong>Jackson 3</strong> با پکیج <code>tools.jackson</code> جایگزین Jackson 2 شده و در
+<code>com.fasterxml</code> باقی نمانده است. اگر کدی از <code>com.fasterxml.jackson.databind.ObjectMapper</code>
+تزریق کند، در زمان اجرا خطای «no qualifying bean» می‌گیرد — چون Spring Boot 4 دیگر آن bean را
+نمی‌سازد. کد این پروژه از <code>tools.jackson.databind.ObjectMapper</code> استفاده می‌کند.
+</div>
+
+<h2 class="sec" id="structure">۳. ساختار پوشه‌ها</h2>
+<p>ریشه بسته‌ها <code>com.example.todo</code> است و بر اساس <em>مسئولیت</em> تقسیم شده، نه بر اساس نوع:</p>
+<pre><code>src/main/java/com/example/todo/
+├── TodoApplication.java          نقطه شروع برنامه
+├── config/                       پیکربندی زیرساختی (امنیت، MVC، OpenAPI، seed)
+├── controller/                   لایه دریافت درخواست HTTP
+├── dto/                          اشیای تبادل داده بین لایه بیرونی و داخلی
+├── entity/                       موجودیت‌های JPA
+├── exception/                    استثناهای دامنه و مدیریت سراسری خطا
+├── interceptor/                  فیلتر سطح Spring MVC
+├── repository/                   دسترسی به پایگاه داده
+├── security/                     مؤلفه‌های اختصاصی احراز هویت
+└── service/                      منطق کسب‌وکار (+ پوشه impl برای پیاده‌سازی‌ها)
+
+src/test/java/com/example/todo/
+├── TodoApplicationTests.java     تست بارگذاری context
+├── RoleBasedAccessControlTest.java  تست کنترل دسترسی
+└── security/JwtServiceTest.java      تست واحد JWT</code></pre>
+<p class="muted">
+الگوی <code>service</code> + <code>service/impl</code> یک قرارداد رایج در پروژه‌های سازمانی است:
+واسط در بسته اصلی و پیاده‌سازی در بسته <code>impl</code> قرار می‌گیرد تا وابستگی‌ها به سمت
+مجرا (client) باشد نه سمت پیاده‌سازی.
+</p>
+
+<h2 class="sec" id="layers">۴. معماری لایه‌ای</h2>
+<p>هر درخواست از این مسیر عبور می‌کند و هر لایه فقط یک وظیفه دارد:</p>
+<table>
+<thead><tr><th>لایه</th><th>مسئولیت</th><th>چه چیزی را نباید بداند</th></tr></thead>
+<tbody>
+<tr><td><code>Controller</code></td><td>دریافت HTTP، اعتبارسنجی ورودی، تعیین کد وضعیت پاسخ</td><td>نباید منطق کسب‌وکار بنویسد، نباید مستقیم به دیتابیس دست بزند</td></tr>
+<tr><td><code>Service</code></td><td>منطق کسب‌وکار، مدیریت تراکنش، تبدیل Entity به DTO</td><td>نباید از کلاس‌های HTTP مثل <code>HttpServletRequest</code> استفاده کند</td></tr>
+<tr><td><code>Repository</code></td><td>اجرای کوئری و کار با پایگاه داده</td><td>نباید منطق کسب‌وکار داشته باشد</td></tr>
+<tr><td><code>Entity</code></td><td>نگاشت جدول پایگاه داده به شیء</td><td>نباید در پاسخ HTTP مستقیم برگردد</td></tr>
+<tr><td><code>DTO</code></td><td>شکل داده در مرز سیستم</td><td>نباید منطق داشته باشد</td></tr>
+<tr><td><code>security</code></td><td>احراز هویت و ساخت توکن</td><td>نباید منطق دامنه را در خود داشته باشد</td></tr>
+</tbody>
+</table>
+<div class="note">
+<strong>چرا DTO جدا از Entity؟</strong> اگر Entity را مستقیم در پاسخ برگردانید، همه ستون‌ها
+(از جمله <code>password</code>) به کاربر نشت می‌کند. همچنین ساختار جدول پایگاه داده به
+قرارداد API گره می‌خورد و تغییر آن به شکست کلاینت‌ها منجر می‌شود.
+</div>
+
+<h2 class="sec" id="flow">۵. جریان یک درخواست محافظت‌شده</h2>
+<div class="flow">
+HTTP Request
+   │
+   ▼
+┌─────────────────────────────────────────┐
+│ JwtAuthenticationFilter                 │  ← توکن را می‌خواند، کاربر را
+│  (قبل از UsernamePasswordAuthentication) │    احراز هویت و در SecurityContext می‌گذارد
+└─────────────────────────────────────────┘
+   │
+   ▼
+┌─────────────────────────────────────────┐
+│ SecurityContextHolderFilter            │  ← context را از repository می‌خواند
+└─────────────────────────────────────────┘
+   │
+   ▼
+┌─────────────────────────────────────────┐
+│ AuthorizationFilter                    │  ← authorizeHttpRequests را بررسی می‌کند
+│  anyRequest().authenticated()           │    در صورت نبود → 401 یا 403
+└─────────────────────────────────────────┘
+   │
+   ▼  مجاز
+┌─────────────────────────────────────────┐
+│ RequestInterceptor                     │  ← فقط ثبت لاگ (لایه MVC)
+└─────────────────────────────────────────┘
+   │
+   ▼
+┌─────────────────────────────────────────┐
+│ Controller → Service → Repository → DB  │
+└─────────────────────────────────────────┘
+   │
+   ▼
+HTTP Response  (JSON)
+</div>
+
+<h2 class="sec" id="entity">۶. لایه Entity</h2>
+
+<h3>۶.۱ موجودیت TodoItem</h3>
+<p>نگاشت یک جدول ساده به یک کلاس جاوا با annotation:</p>
+<pre><code>@Entity
+@Table(name = "todo_items")
+public class TodoItem {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @Column(nullable = false, length = 255, columnDefinition = "nvarchar(255)")
+    private String title;
+
+    @Column(nullable = false, updatable = false)
+    private LocalDateTime createdAt;
+
+    @PrePersist
+    protected void onCreate() {
+        createdAt = LocalDateTime.now();
+    }
+    // getter / setter
+}</code></pre>
+<table>
+<thead><tr><th class="l">Annotation</th><th>معنا</th></tr></thead>
+<tbody>
+<tr><td class="l">@Entity</td><td>این کلاس یک موجودیت JPA است و به جدول نگاشت می‌شود</td></tr>
+<tr><td class="l">@Table</td><td>نام جدول در پایگاه داده</td></tr>
+<tr><td class="l">@Id</td><td>کلید اصلی</td></tr>
+<tr><td class="l">@GeneratedValue(IDENTITY)</td><td>کلید را خود پایگاه داده تولید می‌کند (ستون IDENTITY در SQL Server)</td></tr>
+<tr><td class="l">@Column(nullable, length, updatable)</td><td>قیود ستون</td></tr>
+<tr><td class="l">columnDefinition = "nvarchar"</td><td>نوع ستون دقیق؛ در SQL Server بدون این، رشته به <code>nvarchar</code> نگاشت می‌شود و برای متن فارسی لازم است</td></tr>
+<tr><td class="l">@PrePersist</td><td>پیش از درج در پایگاه داده اجرا می‌شود — روش استاندارد مقداردهی اولیه</td></tr>
+</tbody>
+</table>
+
+<h3>۶.۲ موجودیت AppUser و نقش‌ها</h3>
+<p>نقش‌ها به‌صورت مجموعه‌ای جدا در جدول دیگری نگهداری می‌شوند:</p>
+<pre><code>@ElementCollection(fetch = FetchType.EAGER)
+@CollectionTable(name = "app_user_roles", joinColumns = @JoinColumn(name = "user_id"))
+@Column(name = "role", length = 20, columnDefinition = "nvarchar(20)")
+@Enumerated(EnumType.STRING)
+private Set&lt;Role&gt; roles = EnumSet.noneOf(Role.class);</code></pre>
+<ul>
+<li><code>@ElementCollection</code> یک مجموعه ساده را در جدول جدا ذخیره می‌کند (نه یک موجودیت مستقل).</li>
+<li><code>FetchType.EAGER</code> یعنی نقش‌ها همیشه همراه کاربر خوانده می‌شوند. برای کنترل دسترسی لازم است، چون در هر درخواست به نقش‌ها نیاز داریم. اگر <code>LAZY</code> بود، در حلقه ساخت <code>UserDetails</code> به مشکل <code>LazyInitializationException</code> می‌خوردیم.</li>
+<li><code>EnumType.STRING</code> مقدار enum را به‌صورت متن ذخیره می‌کند نه عدد. خواناتر است و در برابر جابه‌جایی مقادیر enum مقاوم‌تر.</li>
+<li><code>EnumSet.noneOf(Role.class)</code> مجموعه‌ای بهینه مخصوص enum است که در واقع یک <code>long</code> است — سریع‌تر از <code>HashSet</code>.</li>
+</ul>
+<p>enum نقش‌ها با یک متد کمکی نوشته شده تا پیشوند <code>ROLE_</code> در یک جا باشد:</p>
+<pre><code>public enum Role {
+    USER, ADMIN;
+
+    public String getAuthority() {
+        return "ROLE_" + name();
+    }
+}</code></pre>
+<div class="warn">
+پیشوند <code>ROLE_</code> تصمیم خود Spring Security است: متدهای
+<code>hasRole("ADMIN")</code> خودکار دنبال <code>ROLE_ADMIN</code> می‌گردند، در حالی که
+<code>hasAuthority("ROLE_ADMIN")</code> مقدار دقیق را می‌خواهد. نباید پیشوند را دوباره
+داخل مقدار بنویسید، وگرنه مثلاً <code>ROLE_ROLE_ADMIN</code> می‌شود.
+</div>
+
+<h2 class="sec" id="repo">۷. لایه Repository</h2>
+<p>Repository یک <em>interface</em> است که هیچ پیاده‌سازی ندارد. Spring Data در زمان اجرا
+پیاده‌سازی را می‌سازد:</p>
+<pre><code>@Repository
+public interface TodoItemRepository extends JpaRepository&lt;TodoItem, Long&gt; {
+
+    @Query("SELECT t FROM TodoItem t WHERE (:completed IS NULL OR t.completed = :completed) AND (:title IS NULL OR t.title LIKE %:title%)")
+    List&lt;TodoItem&gt; findByFilters(@Param("completed") Boolean completed, @Param("title") String title);
+}</code></pre>
+<ul>
+<li><code>extends JpaRepository&lt;TodoItem, Long&gt;</code> عملیات استاندارد CRUD را به ارث می‌برد.</li>
+<li>نام‌گذاری توافقی (<code>findByUsername</code>، <code>existsByUsername</code>) باعث می‌شود Spring Data کوئری را بسازد؛ نیازی به نوشتن دستی نیست.</li>
+<li>کوئری بالا از نوع JPQL است — روی <em>نام فیلدهای جاوا</em> نوشته می‌شود نه نام ستون‌ها، و JPQL خودش به SQL تبدیل می‌شود.</li>
+<li>الگوی <code>:param IS NULL OR ...</code> برای فیلتر اختیاری استفاده شده: اگر پارامتر <code>null</code> باشد شرط بی‌اثر می‌شود و آن فیلتر اعمال نمی‌گردد.</li>
+<li>خروجی <code>Optional&lt;T&gt;</code> برمی‌گرداند چون ممکن است چیزی پیدا نشود — اجبار کاربر به بررسی وجود دارد.</li>
+</ul>
+
+<h2 class="sec" id="service">۸. لایه Service</h2>
+<p>منطق کسب‌وکار اینجاست و تراکنش مدیریت می‌شود:</p>
+<pre><code>@Override
+@Transactional
+public TodoResponse create(TodoCreateRequest request) {
+    TodoItem item = new TodoItem();
+    item.setTitle(request.getTitle());
+    item.setDescription(request.getDescription());
+    item.setCompleted(request.getCompleted());
+    return new TodoResponse(repository.save(item));
+}
+
+@Override
+@Transactional(readOnly = true)
+public TodoResponse getById(Long id) {
+    TodoItem item = repository.findById(id)
+            .orElseThrow(() -&gt; new ResourceNotFoundException("Todo با شناسه " + id + " یافت نشد"));
+    return new TodoResponse(item);
+}</code></pre>
+<table>
+<thead><tr><th class="l">مفهوم</th><th>توضیح</th></tr></thead>
+<tbody>
+<tr><td class="l">@Transactional</td><td>همه عملیات یا با هم موفق شوند یا همه برگشت (Atomic). بدون آن، نوشتن در دیتابیس بلافاصله commit می‌شود.</td></tr>
+<tr><td class="l">readOnly = true</td><td>فقط خواندن است؛ Hibernate دستور update نمی‌سازد و می‌تواند از کش استفاده کند. برای متدهای خواندنی بهینه‌سازی واقعی است.</td></tr>
+<tr><td class="l">orElseThrow</td><td>به‌جای برگرداندن <code>Optional</code> خالی، استثنا پرتاب می‌کند؛ نتیجه تمیزتر برای لایه بالاتر.</td></tr>
+</tbody>
+</table>
+<p>در لایه Service کلاس DTO از Entity ساخته می‌شود. این تبدیل دستی عمداً انجام شده تا کنترل شود چه چیزی به بیرون می‌رود.</p>
+<div class="note">
+<p><strong>نکته زبان جاوا در این فایل:</strong> استفاده از <code>var</code> دیده نمی‌شود چون در کد
+از نوع صریح استفاده شده — این برای API عمومی بهتر است. همچنین عبارت‌های لامبدا در متدهایی مثل
+<code>getAll</code> برای نگاشت لیست استفاده شده‌اند:</p>
+<pre><code>return repository.findByFilters(completed, title).stream()
+        .map(TodoResponse::new)
+        .toList();</code></pre>
+<p class="muted"><code>TodoResponse::new</code> ارجاع متد (method reference) است — شکل فشرده
+<code>item -&gt; new TodoResponse(item)</code>.</p>
+</div>
+
+<h2 class="sec" id="controller">۹. لایه Controller</h2>
+<pre><code>@RestController
+@RequestMapping("/api/todos")
+@SecurityRequirement(name = OpenApiConfig.BEARER_SCHEME)
+@Tag(name = "Todo", description = "مدیریت وظایف (CRUD)")
+public class TodoController {
+
+    @PostMapping
+    @Operation(summary = "ایجاد وظیفه جدید")
+    public ResponseEntity&lt;TodoResponse&gt; create(@Valid @RequestBody TodoCreateRequest request) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(todoItemService.create(request));
+    }
+
+    @GetMapping
+    public ResponseEntity&lt;List&lt;TodoResponse&gt;&gt; getAll(
+            @RequestParam(required = false) Boolean completed,
+            @RequestParam(required = false) String title) {
+        return ResponseEntity.ok(todoItemService.getAll(completed, title));
+    }
+}</code></pre>
+<table>
+<thead><tr><th class="l">Annotation</th><th>معنا</th></tr></thead>
+<tbody>
+<tr><td class="l">@RestController</td><td>معادل <code>@Controller</code> + <code>@ResponseBody</code>؛ خروجی به‌جای نام View، مستقیم JSON می‌شود</td></tr>
+<tr><td class="l">@Valid</td><td>اعتبارسنجی ورودی را فعال می‌کند؛ در صورت نقض، خطا به <code>GlobalExceptionHandler</code> می‌رود</td></tr>
+<tr><td class="l">@RequestBody</td><td>بدنه درخواست را به شیء تبدیل می‌کند (با Jackson)</td></tr>
+<tr><td class="l">@RequestParam(required=false)</td><td>پارامتر پرس‌وجوی اختیاری</td></tr>
+<tr><td class="l">ResponseEntity</td><td>کنترل دقیق کد وضعیت، هدر و بدنه پاسخ</td></tr>
+<tr><td class="l">@PreAuthorize</td><td>کنترل دسترسی در سطح متد — برای عملیات حساس</td></tr>
+<tr><td class="l">@SecurityRequirement</td><td>فقط برای مستند Swagger؛ هیچ اثر امنیتی ندارد</td></tr>
+</tbody>
+</table>
+<p>برای خواندن کاربر جاری از <code>@AuthenticationPrincipal</code> استفاده شده که به‌جای دسترسی دستی به
+<code>SecurityContextHolder</code>، شیء کاربر را مستقیم تزریق می‌کند:</p>
+<pre><code>public ResponseEntity&lt;UserResponse&gt; me(@AuthenticationPrincipal UserDetails currentUser) {
+    return ResponseEntity.ok(authService.getProfile(currentUser.getUsername()));
+}</code></pre>
+
+<h2 class="sec" id="dto">۱۰. لایه DTO</h2>
+<p>DTO یعنی شیء ساده انتقال داده. کلاس‌های این پروژه با getter/setter دستی نوشته شده‌اند و
+پیام‌های اعتبارسنجی فارسی دارند:</p>
+<pre><code>public class TodoCreateRequest {
+
+    @NotBlank(message = "عنوان نمی‌تواند خالی باشد")
+    @Size(max = 255, message = "عنوان حداکثر ۲۵۵ کاراکتر باشد")
+    private String title;
+
+    @Size(max = 2000, message = "توضیحات حداکثر ۲۰۰۰ کاراکتر باشد")
+    private String description;
+}</code></pre>
+<ul>
+<li><code>@NotBlank</code> هم null و هم رشته خالی و هم فقط فاصله را رد می‌کند.</li>
+<li><code>@Size</code> محدودیت طول رشته.</li>
+<li><code>@NotEmpty</code> (در <code>RoleUpdateRequest</code>) مجموعه خالی را رد می‌کند.</li>
+</ul>
+<p>کلاس پاسخ یک سازنده از روی Entity دارد تا تبدیل در یک خط انجام شود:</p>
+<pre><code>public TodoResponse(TodoItem item) {
+    this.id = item.getId();
+    this.title = item.getTitle();
+    // ...
+}</code></pre>
+
+<h2 class="sec" id="exception">۱۱. مدیریت خطا</h2>
+<p>یک کلاس مرکزی همه خطاها را به JSON یکدست تبدیل می‌کند:</p>
+<pre><code>@RestControllerAdvice
+public class GlobalExceptionHandler {
+
+    @ExceptionHandler(ResourceNotFoundException.class)
+    public ResponseEntity&lt;Map&lt;String, Object&gt;&gt; handleNotFound(ResourceNotFoundException ex) {
+        return build(HttpStatus.NOT_FOUND, "NOT_FOUND", ex.getMessage());
+    }
+
+    @ExceptionHandler({BadCredentialsException.class, UsernameNotFoundException.class})
+    public ResponseEntity&lt;Map&lt;String, Object&gt;&gt; handleBadCredentials(RuntimeException ex) {
+        return build(HttpStatus.UNAUTHORIZED, "BAD_CREDENTIALS", "نام کاربری یا رمز عبور نادرست است");
+    }
+}</code></pre>
+<table>
+<thead><tr><th>خطا</th><th class="l">کد</th><th class="l">error</th><th>زمان رخ دادن</th></tr></thead>
+<tbody>
+<tr><td>ResourceNotFoundException</td><td class="l">404</td><td class="l">NOT_FOUND</td><td>منبع درخواستی وجود ندارد</td></tr>
+<tr><td>MethodArgumentNotValidException</td><td class="l">400</td><td class="l">VALIDATION_FAILED</td><td>اعتبارسنجی ورودی نقض شده (به‌همراه جزئیات هر فیلد)</td></tr>
+<tr><td>UsernameAlreadyExistsException</td><td class="l">409</td><td class="l">USERNAME_ALREADY_EXISTS</td><td>ثبت‌نام با نام کاربری تکراری</td></tr>
+<tr><td>BadCredentialsException</td><td class="l">401</td><td class="l">BAD_CREDENTIALS</td><td>نام کاربری یا رمز نادرست</td></tr>
+<tr><td>DisabledException</td><td class="l">403</td><td class="l">ACCOUNT_DISABLED</td><td>حساب غیرفعال است</td></tr>
+<tr><td>AccessDeniedException</td><td class="l">403</td><td class="l">FORBIDDEN</td><td>کاربر وارد شده اما نقش لازم را ندارد</td></tr>
+<tr><td>دو handler اختصاصی</td><td class="l">401 / 403</td><td class="l">UNAUTHORIZED / FORBIDDEN</td><td>پاسخ‌های خود Spring Security (پیش از رسیدن به کنترلر)</td></tr>
+</tbody>
+</table>
+<div class="note">
+تفکیک <strong>۴۰۱</strong> و <strong>۴۰۳</strong> مهم است: ۴۰۱ یعنی «نمی‌دانم شما کی هستید» و ۴۰۳ یعنی
+«می‌دانم، اما اجازه ندارید». پیام‌های ورود نادرست به‌عمد یکسان‌اند تا مهاجم نتواند تشخیص دهد
+کدام‌یک اشتباه بوده است.
+</div>
+
+<h2 class="sec" id="security">۱۲. امنیت و احراز هویت</h2>
+
+<h3>۱۲.۱ کلاس SecurityConfig</h3>
+<p>قلب پیکربندی امنیت، متد <code>securityFilterChain</code> است:</p>
+<pre><code>http
+    .csrf(AbstractHttpConfigurer::disable)
+    .sessionManagement(session -&gt; session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+    .exceptionHandling(handling -&gt; handling
+            .authenticationEntryPoint(authenticationEntryPoint)
+            .accessDeniedHandler(accessDeniedHandler))
+    .authorizeHttpRequests(requests -&gt; requests
+            .requestMatchers("/api/auth/login", "/api/auth/register").permitAll()
+            .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
+            .requestMatchers("/api/users/**").hasRole("ADMIN")
+            .anyRequest().authenticated())
+    .logout(AbstractHttpConfigurer::disable)
+    .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);</code></pre>
+<table>
+<thead><tr><th class="l">تنظیم</th><th>چرا لازم است</th></tr></thead>
+<tbody>
+<tr><td class="l">csrf disabled</td><td>توکن در هدر ارسال می‌شود، نه کوکی — پس حمله CSRF معنا ندارد. غیرفعال کردن آن برای API بی‌حالت لازم است وگرنه هر درخواست به توکن CSRF نیاز دارد.</td></tr>
+<tr><td class="l">STATELESS</td><td>هیچ نشستی (session) ساخته نمی‌شود؛ وضعیت فقط در خود توکن است.</td></tr>
+<tr><td class="l">addFilterBefore</td><td>فیلتر JWT قبل از فیلتر ورود نام کاربری/رمز اجرا می‌شود تا قبل از بررسی مجوز، کاربر شناسایی شده باشد.</td></tr>
+<tr><td class="l">logout disabled</td><td>خروج از سیستم در حالت بی‌حالت بی‌معنی است؛ توکن تا انقضا معتبر می‌ماند.</td></tr>
+<tr><td class="l">@EnableMethodSecurity</td><td>برای فعال شدن <code>@PreAuthorize</code> لازم است.</td></tr>
+</tbody>
+</table>
+<p>دو bean دیگر هم تعریف شده‌اند:</p>
+<ul>
+<li><code>PasswordEncoder</code> از نوع <code>BCryptPasswordEncoder</code>. رمزها با الگوریتم bcrypt هش می‌شوند که برای رمز عبور طراحی شده (کند و نمک‌دار)، برخلاف SHA-256 که برای داده‌های سریع مناسب است و در برابر حمله جستجوی فراگیر آسیب‌پذیر است.</li>
+<li><code>AuthenticationManager</code> که در متد <code>login</code> استفاده می‌شود تا بررسی نام کاربری و رمز با همان زیرساخت استاندارد Spring Security انجام شود.</li>
+</ul>
+
+<h3>۱۲.۲ فیلتر خودکار (نکته ظریف)</h3>
+<p>چون <code>JwtAuthenticationFilter</code> یک bean از نوع <code>Filter</code> است، Spring Boot آن را
+به‌صورت خودکار به‌عنوان servlet filter هم ثبت می‌کرد — یعنی دو بار اجرا می‌شد. با این bean ثبت خودکار غیرفعال شد:</p>
+<pre><code>@Bean
+public FilterRegistrationBean&lt;JwtAuthenticationFilter&gt; jwtAuthenticationFilterRegistration(
+        JwtAuthenticationFilter jwtAuthenticationFilter) {
+    FilterRegistrationBean&lt;JwtAuthenticationFilter&gt; registration =
+            new FilterRegistrationBean&lt;&gt;(jwtAuthenticationFilter);
+    registration.setEnabled(false);
+    return registration;
+}</code></pre>
+
+<h3>۱۲.۳ خواندن هدر Authorization</h3>
+<pre><code>private String resolveToken(HttpServletRequest request) {
+    String header = request.getHeader("Authorization");
+    if (header == null) return null;
+
+    String token = header.trim();
+    while (hasBearerScheme(token)) {
+        token = token.substring(BEARER_SCHEME.length()).trim();
+    }
+    return isJwsShaped(token) ? token : null;
+}</code></pre>
+<ul>
+<li>طرح احراز هویت بدون حساسیت به بزرگی/کوچکی حروف مقایسه می‌شود (طبق RFC 7235)؛ پس <code>bearer</code> و <code>BEARER</code> هم پذیرفته می‌شوند.</li>
+<li>پیشوند تکراری حذف می‌شود، چون در Swagger UI کاربران اغلب کل مقدار شامل طرح را داخل کادر Authorize می‌چسبانند و نتیجه <code>Bearer Bearer &lt;token&gt;</code> می‌شود.</li>
+<li>توکن خام بدون طرح هم پذیرفته می‌شود، چون هدر زیادی دستی پر می‌شود.</li>
+<li>تنها مقادیری که شکل یک JWS دارند (سه بخش جداشده با نقطه، هر سه غیرخالی) توکن شمرده می‌شوند؛ بقیه نادیده گرفته می‌شوند تا درخواست با ۴۰۱ رد شود.</li>
+</ul>
+<div class="warn">
+این بخش <em>عمداً</em> سخاوتمندانه است. از نظر امنیتی چیزی از دست نمی‌رود، چون برای عبور
+همچنان باید توکن با کلید درست امضا شده باشد؛ اما اگر روزی خواستید سخت‌گیر باشید، شرط
+<code>hasBearerScheme</code> را اجباری کنید تا فقط طرح Bearer پذیرفته شود.
+</div>
+
+<h2 class="sec" id="jwt">۱۳. JWT چطور کار می‌کند</h2>
+<p>JWT یک رشته متنی با سه بخش جداشده با نقطه است: <code>header.payload.signature</code></p>
+<pre><code>public String generateToken(AppUser user) {
+    Instant now = Instant.now();
+    return Jwts.builder()
+            .subject(user.getUsername())
+            .claim(ROLES_CLAIM, user.getRoles().stream().map(Enum::name).sorted().toList())
+            .issuedAt(Date.from(now))
+            .expiration(Date.from(now.plusMillis(expirationMillis)))
+            .signWith(signingKey)
+            .compact();
+}</code></pre>
+<table>
+<thead><tr><th class="l">claim</th><th>معنا</th></tr></thead>
+<tbody>
+<tr><td class="l">sub</td><td>نام کاربری (موضوع توکن)</td></tr>
+<tr><td class="l">iat</td><td>زمان صدور</td></tr>
+<tr><td class="l">exp</td><td>زمان انقضا — پس از آن توکن نامعتبر است</td></tr>
+<tr><td class="l">roles</td><td>فهرست نقش‌های کاربر به‌صورت آرایه‌ای از رشته‌ها</td></tr>
+</tbody>
+</table>
+<p>
+امضا با کلید متقارن <code>HS256</code> ساخته می‌شود. یعنی همان کلید هم برای تولید امضا و هم برای
+تأیید آن استفاده می‌شود؛ پس افشای کلید یعنی امکان جعل توکن. کلید به‌صورت Base64 در
+<code>app.jwt.secret</code> است و JJWT در صورت کوتاه بودن، خطا می‌دهد تا کلید ضعیف به‌طور ناخواسته
+پذیرفته نشود.
+</p>
+<div class="ok">
+<strong>نکته امنیتی:</strong> نقش‌ها داخل توکن فقط برای اطلاع‌رسانی‌اند. کنترل دسترسی واقعی در
+<code>CustomUserDetailsService</code> دوباره از پایگاه داده خوانده می‌شود. این کار عمدی است: اگر
+نقش کسی تغییر کند، توکن قدیمی او بلافاصله بی‌اثر می‌شود، بدون آنکه منتظر انقضای توکن بمانیم.
+</div>
+<p>کلاس <code>JwtService</code> parser را یک بار در سازنده می‌سازد (thread-safe و کارا) و
+اعتبارسنجی را در یک متد متمرکز کرده است:</p>
+<pre><code>public boolean isValid(String token, String username) {
+    try {
+        Claims claims = parseClaims(token);
+        return username.equals(claims.getSubject()) &amp;&amp; claims.getExpiration().after(new Date());
+    } catch (JwtException | IllegalArgumentException ex) {
+        return false;
+    }
+}</code></pre>
+
+<h2 class="sec" id="filterchain">۱۴. زنجیره فیلترها</h2>
+<p>درخواست با یک توکن معتبر چه مسیری را طی می‌کند:</p>
+<pre><code>String token = resolveToken(request);
+if (token != null &amp;&amp; SecurityContextHolder.getContext().getAuthentication() == null) {
+    authenticate(request, token);
+}
+filterChain.doFilter(request, response);</code></pre>
+<ol>
+<li>اگر هدر توکن نداشت، فیلتر کاری نمی‌کند و زنجیره ادامه می‌یابد.</li>
+<li>اگر از قبل احراز هویتی انجام شده باشد، دوباره کاری نمی‌کند.</li>
+<li>توکن بررسی می‌شود؛ در صورت معتبر بودن، کاربر از پایگاه داده بارگذاری و یک شیء <code>Authentication</code> در <code>SecurityContextHolder</code> قرار می‌گیرد.</li>
+<li>در صورت نامعتبر بودن، علت رد شدن در سطح debug ثبت می‌شود و زمینه امنیتی پاک می‌گردد.</li>
+</ol>
+<p>نکته مهم: فیلتر هرگز خودش خطا برنمی‌گرداند. کار آن فقط «احراز هویت یا عدم احراز هویت» است؛
+تصمیم‌گیری درباره مجاز بودن یا نبودن با فیلتر مجوز است.</p>
+
+<h2 class="sec" id="rbac">۱۵. کنترل دسترسی بر پایه نقش</h2>
+<table>
+<thead><tr><th class="l">مسیر</th><th class="l">روش</th><th>شرط</th><th>وضعیت بدون توکن</th></tr></thead>
+<tbody>
+<tr><td class="l">/api/auth/register</td><td class="l">POST</td><td>عمومی</td><td>۲۰۱</td></tr>
+<tr><td class="l">/api/auth/login</td><td class="l">POST</td><td>عمومی</td><td>۲۰۰</td></tr>
+<tr><td class="l">/api/auth/me</td><td class="l">GET</td><td>واردشده</td><td>۴۰۱</td></tr>
+<tr><td class="l">/api/todos</td><td class="l">GET</td><td>واردشده</td><td>۴۰۱</td></tr>
+<tr><td class="l">/api/todos</td><td class="l">POST</td><td>واردشده</td><td>۴۰۱</td></tr>
+<tr><td class="l">/api/todos/{id}</td><td class="l">GET</td><td>واردشده</td><td>۴۰۱</td></tr>
+<tr><td class="l">/api/todos/{id}</td><td class="l">PUT</td><td><strong>فقط ADMIN</strong></td><td>۴۰۱ / برای USER برابر ۴۰۳</td></tr>
+<tr><td class="l">/api/todos/{id}</td><td class="l">DELETE</td><td><strong>فقط ADMIN</strong></td><td>۴۰۱ / برای USER برابر ۴۰۳</td></tr>
+<tr><td class="l">/api/users</td><td class="l">GET</td><td><strong>فقط ADMIN</strong></td><td>۴۰۱ / برای USER برابر ۴۰۳</td></tr>
+<tr><td class="l">/api/users/{id}/roles</td><td class="l">PUT</td><td><strong>فقط ADMIN</strong></td><td>۴۰۱ / برای USER برابر ۴۰۳</td></tr>
+<tr><td class="l">/swagger-ui/**</td><td class="l">GET</td><td>عمومی</td><td>۲۰۰</td></tr>
+<tr><td class="l">/v3/api-docs</td><td class="l">GET</td><td>عمومی</td><td>۲۰۰</td></tr>
+</tbody>
+</table>
+<p>دو سطح کنترل وجود دارد و این تفکیک آگاهانه است:</p>
+<ul>
+<li><strong>سطح مسیر</strong> در <code>authorizeHttpRequests</code> — برای تعیین اینکه چه چیزی عمومی است و چه چیزی نیاز به ورود دارد.</li>
+<li><strong>سطح عملیات</strong> با <code>@PreAuthorize</code> — برای تفکیک بین نقش‌ها. در <code>UserController</code> روی خود کلاس قرار گرفته تا همه متدها یکسان سخت‌گیر باشند:</li>
+</ul>
+<pre><code>@RestController
+@RequestMapping("/api/users")
+@PreAuthorize("hasRole('ADMIN')")
+public class UserController { ... }</code></pre>
+
+<h3>۱۵.۱ حساب مدیر اولیه</h3>
+<p>چون اولین کاربر ثبت‌نام‌شده فقط نقش USER می‌گیرد، بدون راه‌اندازی مدیر مسیر <code>/api/users</code>
+غیرقابل دسترس می‌ماند. کلاس <code>AdminBootstrap</code> این مشکل را حل می‌کند:</p>
+<pre><code>if (!StringUtils.hasText(adminUsername) || !StringUtils.hasText(adminPassword)) {
+    log.warn("حساب مدیر ساخته نشد؛ ...");
+    return;
+}
+if (repository.existsByUsername(adminUsername)) {
+    log.info("کاربر '{}' از قبل وجود دارد؛ ساخت حساب مدیر رد شد", adminUsername);
+    return;
+}
+// ساخت کاربر با نقش‌های USER و ADMIN</code></pre>
+<p>
+این کلاس <code>ApplicationRunner</code> است و پس از آماده شدن کامل context اجرا می‌شود. رفتار آن
+<b>idempotent</b> است: اگر کاربر از قبل وجود داشته باشد کاری نمی‌کند، پس هر بار راه‌اندازی مجدد
+اپلیکیشن مشکلی ایجاد نمی‌کند.
+</p>
+<div class="warn">
+این الگو در محیط واقعی یک تصمیم معماری است: اگر مدیر را در خود کد ایجاد کنید، حذف آن از پایگاه داده
+فقط تا راه‌اندازی بعدی دوام می‌آورد. در سامانه واقعی بهتر است مدیر از مسیر مدیریتی یا
+migration ساخته شود، و این seed فقط برای توسعه بماند.
+</div>
+
+<h2 class="sec" id="filtervsinterceptor">۱۶. Filter در برابر Interceptor</h2>
+<p>این پروژه هر دو را دارد و تفاوتشان مهم است:</p>
+<table>
+<thead><tr><th>ویژگی</th><th>Filter</th><th>HandlerInterceptor</th></tr></thead>
+<tbody>
+<tr><td>لایه</td><td>Servlet (پایین‌تر از Spring)</td><td>Spring MVC (بالاتر از Controller)</td></tr>
+<tr><td>زمان اجرا</td><td>قبل از ورود به DispatcherServlet</td><td>پس از رسیدن به handler مشخص</td></tr>
+<tr><td>مناسب برای</td><td>احراز هویت، CORS، فیلتر پاسخ‌های حساس</td><td>لاگ درخواست، اندازه‌گیری، پرشدن ThreadLocal</td></tr>
+<tr><td>در این پروژه</td><td><code>JwtAuthenticationFilter</code></td><td><code>RequestInterceptor</code></td></tr>
+</tbody>
+</table>
+<p>
+<code>RequestInterceptor</code> فقط در <code>preHandle</code> مسیر درخواست را لاگ می‌کند و
+<code>WebConfig</code> آن را روی مسیرهای <code>/api/**</code> ثبت می‌کند. دلیل اینکه احراز هویت در
+<code>Interceptor</code> نیست و در <code>Filter</code> است، این است که احراز هویت باید پیش از ورود
+به لایه MVC انجام شود تا همه مسیرها — از جمله مسیرهایی که اصلاً handler ندارند — محافظت شوند.
+</p>
+
+<h2 class="sec" id="config">۱۷. کلاس‌های پیکربندی</h2>
+<table>
+<thead><tr><th class="l">کلاس</th><th>مسئولیت</th></tr></thead>
+<tbody>
+<tr><td class="l">SecurityConfig</td><td>زنجیره فیلتر امنیتی، رمزنگاری، مدیریت کاربران</td></tr>
+<tr><td class="l">WebConfig</td><td>ثبت <code>RequestInterceptor</code> در زنجیره MVC</td></tr>
+<tr><td class="l">OpenApiConfig</td><td>تعریف طرح امنیتی Bearer در مستند OpenAPI تا دکمه Authorize در Swagger ظاهر شود</td></tr>
+<tr><td class="l">AdminBootstrap</td><td>ساخت حساب مدیر در نخستین اجرا</td></tr>
+</tbody>
+</table>
+<h3>نکته‌ای که در <code>OpenApiConfig</code> گیج‌کننده است</h3>
+<p>
+<code>@SecurityRequirement</code> هیچ اثر امنیتی ندارد و فقط به مستندسازی مربوط است. کنترل واقعی
+دسترسی از <code>SecurityConfig</code> می‌آید. اگر این annotation را حذف کنید، برنامه همچنان درست
+کار می‌کند اما در Swagger دیگر دکمه قفل نمایش داده نمی‌شود. به همین دلیل نام طرح به‌صورت
+ثابت <code>public static final String BEARER_SCHEME</code> تعریف شده تا کنترلرها به آن ارجاع دهند
+و رشته <code>"bearerAuth"</code> در چند نقطه تکرار نشود.
+</p>
+
+<h2 class="sec" id="db">۱۸. دیتابیس</h2>
+<p>نگاشت‌های JPA به این جدول‌ها ترجمه می‌شوند:</p>
+<table>
+<thead><tr><th class="l">جدول</th><th class="l">ستون‌ها</th><th>توضیح</th></tr></thead>
+<tbody>
+<tr><td class="l">todo_items</td><td class="l">id, title, description, completed, createdAt</td><td>وظایف</td></tr>
+<tr><td class="l">app_users</td><td class="l">id, username (یکتا), password, enabled, createdAt</td><td>کاربران؛ رمز به‌صورت هش bcrypt ذخیره می‌شود</td></tr>
+<tr><td class="l">app_user_roles</td><td class="l">user_id, role</td><td>نقش‌های هر کاربر (چند به چند)</td></tr>
+</tbody>
+</table>
+<div class="warn">
+<code>spring.jpa.hibernate.ddl-auto=update</code> در محیط توسعه راحت است اما برای تولید خطرناک:
+تغییر ستون یا حذف آن را خودکار انجام می‌دهد و تاریخچه‌ای نگه نمی‌دارد. برای تولید از ابزار
+مهاجرت مانند Flyway یا Liquibase استفاده کنید.
+</div>
+<p>
+پارامترهای <code>encrypt=true</code> و <code>trustServerCertificate=true</code> در JDBC URL به
+<code>mssql-jdbc</code> مربوط‌اند. دومی گواهی سرور را بررسی نمی‌کند و برای توسعه لازم است،
+ولی در محیط واقعی یک ریسک امنیتی است که باید با یک گواهی معتبر جایگزین شود.
+</p>
+<div class="note">
+پوشه <code>native/</code> در ریشه پروژه، یک DLL ویندوزی برای احراز هویت یکپارچه SQL Server
+(<code>mssql-jdbc_auth</code>) است که در <code>pom.xml</code> با <code>-Djava.library.path</code>
+ارجاع داده شده. این برنامه با احراز هویت SQL (نام کاربری و رمز) کار می‌کند، پس به آن DLL
+نیازی ندارد و در ایمیج Docker نیز عمداً کپی نمی‌شود.
+</div>
+
+<h2 class="sec" id="api">۱۹. مرجع API</h2>
+<h3>ورود</h3>
+<pre><code>POST /api/auth/register
+{ "username": "ali", "password": "Test@12345" }
+
+POST /api/auth/login
+{ "username": "admin", "password": "Sam@12345" }
+→ 200
+{
+  "accessToken": "eyJhbGciOiJIUzI1NiJ9...",
+  "tokenType": "Bearer",
+  "expiresInSeconds": 3600,
+  "issuedAt": "2026-10-05T09:09:09Z",
+  "username": "admin",
+  "roles": ["USER", "ADMIN"]
+}</code></pre>
+<p>برای درخواست‌های بعدی، هدر زیر را بفرستید:</p>
+<pre><code>Authorization: Bearer &lt;accessToken&gt;</code></pre>
+
+<h2 class="sec" id="props">۲۰. تنظیمات</h2>
+<table>
+<thead><tr><th class="l">کلید</th><th>کاربرد</th></tr></thead>
+<tbody>
+<tr><td class="l">spring.datasource.url</td><td>آدرس اتصال به SQL Server</td></tr>
+<tr><td class="l">spring.datasource.username / password</td><td>نام کاربری و رمز پایگاه داده</td></tr>
+<tr><td class="l">spring.jpa.hibernate.ddl-auto</td><td>ساخت/به‌روزرسانی خودکار جدول‌ها</td></tr>
+<tr><td class="l">spring.jpa.show-sql</td><td>چاپ SQL روی کنسول</td></tr>
+<tr><td class="l">spring.jpa.properties.hibernate.format_sql</td><td>قالب‌بندی خوانا برای SQL</td></tr>
+<tr><td class="l">spring.jpa.database-platform</td><td>دیالکت SQL Server (بهینه‌سازی نوع داده و سینتکس)</td></tr>
+<tr><td class="l">springdoc.swagger-ui.path</td><td>آدرس Swagger UI</td></tr>
+<tr><td class="l">app.jwt.secret</td><td>کلید امضای HS256 به‌صورت Base64؛ با <code>JWT_SECRET</code> قابل بازنویسی</td></tr>
+<tr><td class="l">app.jwt.expiration-ms</td><td>مدت اعتبار توکن (پیش‌فرض ۳۶۰۰۰۰۰ میلی‌ثانیه = یک ساعت)</td></tr>
+<tr><td class="l">app.bootstrap-admin.username / password</td><td>حساب مدیر اولیه؛ با متغیر محیطی قابل بازنویسی یا خالی برای رد کردن</td></tr>
+</tbody>
+</table>
+<div class="note">
+الگوی <code>${VAR:default}</code> در <code>application.properties</code> یعنی: اگر متغیر محیطی
+<code>VAR</code> تنظیم شده باشد از آن استفاده کن، وگرنه مقدار پیش‌فرض. این الگو در Spring Boot
+رایج است چون هم برای توسعه راحت است و هم برای تولید از طریق محیط قابل بازنویسی — بدون آنکه
+مقدار حساس در گیت بنشیند.
+</div>
+
+<h2 class="sec" id="tests">۲۱. تست‌ها</h2>
+<p>در مجموع ۲۶ تست در سه کلاس:</p>
+<table>
+<thead><tr><th class="l">کلاس</th><th>چه چیزی را می‌سنجد</th></tr></thead>
+<tbody>
+<tr><td class="l">TodoApplicationTests</td><td>بارگذاری کامل context — یک تست «آیا برنامه بالا می‌آید»</td></tr>
+<tr><td class="l">JwtServiceTest</td><td>تست واحد: صدور توکن، استخراج نام کاربری و نقش‌ها، انقضا، دستکاری امضا، کلید متفاوت، توکن خراب</td></tr>
+<tr><td class="l">RoleBasedAccessControlTest</td><td>تست یکپارچه روی MockMvc: ثبت‌نام، ورود، ۴۰۱ بدون توکن، ۴۰۳ برای نقش ناکافی، موفقیت مدیر، توکن منقضی، حالت‌های مختلف هدر</td></tr>
+</tbody>
+</table>
+<p>این تست‌ها روی همان پایگاه داده توسعه اجرا می‌شوند و برای جلوگیری از باقی گذاشتن رد، در
+<code>@AfterEach</code> کاربران و وظایف ساخته‌شده را پاک می‌کنند:</p>
+<pre><code>@AfterEach
+void tearDown() {
+    todoItemRepository.findAllById(createdTodoIds).forEach(todoItemRepository::delete);
+    createdTodoIds.clear();
+    userRepository.findAll().stream()
+            .filter(user -&gt; user.getUsername().equals(userName) || user.getUsername().equals(adminName))
+            .forEach(userRepository::delete);
+}</code></pre>
+<div class="note">
+این تست‌ها به‌جای mock، اپلیکیشن واقعی را بالا می‌آورند و با <code>MockMvc</code> درخواست
+می‌زنند. یعنی زنجیره فیلتر، کنترل دسترسی و JPA واقعاً اجرا می‌شوند و فقط اتصال شبکه شبیه‌سازی
+می‌شود. برای تست رفتار امنیتی، این روش از تست واحد دقیق‌تر است.
+</div>
+
+<h2 class="sec" id="docker">۲۲. Docker</h2>
+<p>فایل <code>Dockerfile</code> دو مرحله‌ای (multi-stage) است:</p>
+<table>
+<thead><tr><th>مرحله</th><th class="l">ایمیج</th><th>کار</th></tr></thead>
+<tbody>
+<tr><td>ساخت</td><td class="l">maven:3.9.16-eclipse-temurin-26</td><td>دانلود وابستگی‌ها در لایه جدا، سپس کامپایل</td></tr>
+<tr><td>اجرا</td><td class="l">eclipse-temurin:26-jre</td><td>اجرای jar؛ JDK لازم نیست و ایمیج چند صد مگابایت کوچک‌تر می‌شود</td></tr>
+</tbody>
+</table>
+<ul>
+<li>شماره نسخه Maven دقیقاً با <code>.mvn/wrapper/maven-wrapper.properties</code> یکسان است تا build داخل کانتینر با build محلی تفاوتی نداشته باشد.</li>
+<li>وابستگی‌ها در لایه جدا دانلود می‌شوند تا تغییر کد به دانلود دوباره منجر نشود.</li>
+<li><code>-XX:MaxRAMPercentage</code> باعث می‌شود هیپ طبق محدودیت حافظه کانتینر تنظیم شود، نه طبق رمز ماشین میزبان؛ شایع‌ترین علت کشته شدن ناگهانی کانتینرهای Spring Boot همین است.</li>
+<li>برنامه با کاربر غیر ریشه اجرا می‌شود.</li>
+<li>در <code>ENTRYPOINT</code> از <code>exec</code> استفاده شده تا JVM فرایند شماره ۱ شود و سیگنال stop را بگیرد و خاموشی نرم انجام دهد.</li>
+<li><code>.dockerignore</code> پوشه <code>target/</code>، متادیتای گیت و پوشه <code>native/</code> (DLL ویندوزی) را کنار می‌گذارد تا در ایمیج نروند.</li>
+<li><code>.gitattributes</code> برای این فایل‌ها خط جدید LF را تضمین می‌کند، چون در ویندوز با <code>core.autocrlf=true</code> حالت CRLF باعث شکستن خطوط پیوسته Docker می‌شود.</li>
+</ul>
+<p>در <code>docker-compose.yml</code> تنها چیزی که باید تغییر کند آدرس پایگاه داده است، چون داخل کانتینر
+<code>localhost</code> به خود کانتینر اشاره می‌کند نه به ماشینی که SQL Server روی آن است:</p>
+<pre><code>SPRING_DATASOURCE_URL: "jdbc:sqlserver://host.docker.internal:1433;databaseName=TodoDb;encrypt=true;trustServerCertificate=true"</code></pre>
+<p>
+بقیه تنظیمات از <code>application.properties</code> خوانده می‌شوند، چون Spring Boot نگاشت
+<em>relaxed binding</em> دارد و متغیر محیطی <code>SPRING_DATASOURCE_USERNAME</code> بی‌دردسر
+جایگزین <code>spring.datasource.username</code> می‌شود.
+</p>
+
+<h2 class="sec" id="debt">۲۳. بدهی‌های فنی و نکات باقی‌مانده</h2>
+<p>مواردی که آگاهانه باقی مانده‌اند و برای محیط واقعی باید رسیدگی شوند:</p>
+<table>
+<thead><tr><th>مورد</th><th>توضیح</th></tr></thead>
+<tbody>
+<tr><td>مقدار <code>completed</code> تهی</td><td>در DTO اختیاری است اما ستون پایگاه داده <code>NOT NULL</code> دارد. اگر در درخواست ارسال نشود، خطای ۵۰۰ رخ می‌دهد. بهتر است یا مقدار پیش‌فرض بگیرد یا با validation پر شود.</td></tr>
+<tr><td>متدهای بلااستفاده</td><td><code>TodoItemService</code> سه بار <code>getAll</code> دارد، ولی کنترلر فقط از نسخه دوپارامتری استفاده می‌کند.</td></tr>
+<tr><td>اسرار در مخزن</td><td>کلید JWT، رمز پایگاه داده و رمز مدیر در <code>application.properties</code> هستند. برای توسعه قابل قبول است و قابل بازنویسی با متغیر محیطی، ولی نباید در مخزن عمومی باشد.</td></tr>
+<tr><td>بدون توکن تازه‌سازی</td><td>با انقضای توکن کاربر باید دوباره وارد شود. در سامانه واقعی معمولاً access token کوتاه‌عمر و refresh token بلندعمر اضافه می‌شود.</td></tr>
+<tr><td>بدون محدودیت نرخ</td><td>روی <code>/api/auth/login</code> محدودیت تلاش وجود ندارد، پس در برابر حمله جستجوی رمز آسیب‌پذیر است.</td></tr>
+<tr><td>بدون CORS</td><td>عمداً تنظیم نشده چون پروژه فرانت‌اند ندارد. اگر بعداً فرانت‌اند اضافه شود باید تنظیم شود، وگرنه درخواست‌های مرورگر بلاک می‌شوند.</td></tr>
+<tr><td>خروج از سیستم</td><td>در حالت بی‌حالت، حذف توکن از سمت سرور ممکن نیست. برای ابطال فوری باید فهرست سیاه توکن یا نسخه‌دار کردن توکن اضافه شود.</td></tr>
+</tbody>
+</table>
+
+<footer>
+<p>مستندشده در تاریخ ۱۴ مهر ۱۴۰۵ — بر اساس کد موجود در مخزن. با تغییر کد، این سند را به‌روز کنید.</p>
+</footer>
+</main>
+</div>
+</body>
+</html>
