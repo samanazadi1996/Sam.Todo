@@ -1,19 +1,82 @@
 services:
+  # ---------------------------------------------------------------------------
+  # SQL Server
+  # ---------------------------------------------------------------------------
+  sqlserver:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: todo-sqlserver
+    environment:
+      # The container refuses to start unless the EULA is accepted.
+      ACCEPT_EULA: "Y"
+      MSSQL_SA_PASSWORD: "Sam@12345"
+      MSSQL_PID: "Developer"
+    ports:
+      # Port 1433 on the host is already taken by the SQL Server installed on
+      # Windows, so the container publishes on 1434 instead. The app never uses
+      # this mapping - it reaches the database over the compose network by the
+      # service name `sqlserver`. This exists only for tools such as SSMS or
+      # the IntelliJ Database tool.
+      - "1434:1433"
+    volumes:
+      - todo-sqlserver-data:/var/opt/mssql
+    healthcheck:
+      # Tools 18 is the path on the 2022-latest image; older images ship
+      # sqlcmd under /opt/mssql-tools/bin. -C trusts the self-signed certificate.
+      test:
+        - CMD-SHELL
+        - /opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P "$$MSSQL_SA_PASSWORD" -C -b -Q "SELECT 1" > /dev/null || exit 1
+      interval: 10s
+      timeout: 10s
+      retries: 20
+      start_period: 40s
+    restart: unless-stopped
+
+  # ---------------------------------------------------------------------------
+  # One-shot job: create the application database
+  #
+  # The image only creates master/tempdb/model/msdb, so connecting with
+  # databaseName=TodoDb would fail before this runs.
+  # ---------------------------------------------------------------------------
+  sqlserver-init:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: todo-sqlserver-init
+    depends_on:
+      sqlserver:
+        condition: service_healthy
+    environment:
+      MSSQL_SA_PASSWORD: "Sam@12345"
+    entrypoint:
+      - /bin/bash
+      - -c
+    command:
+      - |
+        /opt/mssql-tools18/bin/sqlcmd -S sqlserver -U sa -P "$$MSSQL_SA_PASSWORD" -C -b \
+          -Q "IF DB_ID('TodoDb') IS NULL CREATE DATABASE [TodoDb];"
+    restart: "no"
+
+  # ---------------------------------------------------------------------------
+  # Application
+  # ---------------------------------------------------------------------------
   todo:
     build:
       context: .
       dockerfile: Dockerfile
     image: todo:local
     container_name: todo
+    depends_on:
+      sqlserver-init:
+        condition: service_completed_successfully
     ports:
       - "8080:8080"
-
     environment:
-      # Only the host has to change: inside a container "localhost" is the
-      # container itself, not the machine running SQL Server.
-      # host.docker.internal works on Docker Desktop; host-gateway maps it on
-      # plain Linux, where that name does not exist by default.
-      SPRING_DATASOURCE_URL: "jdbc:sqlserver://host.docker.internal:1433;databaseName=TodoDb;encrypt=true;trustServerCertificate=true"
+      # Inside the compose network the database is reachable by service name.
+      #
+      # To use the SQL Server installed on Windows instead of this one, replace
+      # the host below with host.docker.internal and delete the sqlserver and
+      # sqlserver-init services. On plain Linux you also need:
+      #   extra_hosts:
+      #     - "host.docker.internal:host-gateway"
+      SPRING_DATASOURCE_URL: "jdbc:sqlserver://sqlserver:1433;databaseName=TodoDb;encrypt=true;trustServerCertificate=true"
 
       # Everything else (datasource credentials, JWT secret, bootstrap admin)
       # is read from application.properties. Override these in production:
@@ -23,8 +86,7 @@ services:
       # BOOTSTRAP_ADMIN_PASSWORD
 
       JAVA_OPTS: "-XX:MaxRAMPercentage=75.0 -Dfile.encoding=UTF-8"
-
-    extra_hosts:
-      - "host.docker.internal:host-gateway"
-
     restart: unless-stopped
+
+volumes:
+  todo-sqlserver-data:
