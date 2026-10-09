@@ -7,10 +7,12 @@ import com.example.todo.entity.TodoItem;
 import com.example.todo.exception.ResourceNotFoundException;
 import com.example.todo.repository.TodoItemRepository;
 import com.example.todo.service.TodoItemService;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.data.domain.Pageable;
 
-import java.util.List;
+import java.time.LocalDateTime;
 
 @Service
 public class TodoItemServiceImpl implements TodoItemService {
@@ -60,21 +62,14 @@ public class TodoItemServiceImpl implements TodoItemService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<TodoResponse> getAll() {
-        return getAll(null, null);
-    }
+    public Page<TodoResponse> getPageable(
+            Boolean completed,
+            String title,
+            LocalDateTime createdAtFrom,
+            LocalDateTime createdAtTo,
+            Pageable pageable) {
 
-    @Override
-    @Transactional(readOnly = true)
-    public List<TodoResponse> getAll(Boolean completed) {
-        return getAll(completed, null);
-    }
-
-    @Override
-    @Transactional(readOnly = true)
-    public List<TodoResponse> getAll(Boolean completed, String title) {
-        return repository.findByFilters(completed, title).stream()
-                .map(TodoResponse::new)
-                .toList();
-    }
-}
+        return repository.findAll(
+                completed, title, createdAtFrom, createdAtTo, pageable
+        ).map(TodoResponse::new);
+    }}

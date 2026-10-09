@@ -3,8 +3,11 @@ package com.example.todo.service;
 import com.example.todo.dto.TodoCreateRequest;
 import com.example.todo.dto.TodoResponse;
 import com.example.todo.dto.TodoUpdateRequest;
+import org.springframework.data.domain.Page;
 
+import java.time.LocalDateTime;
 import java.util.List;
+import org.springframework.data.domain.Pageable;
 
 public interface TodoItemService {
 
@@ -16,9 +19,9 @@ public interface TodoItemService {
 
     TodoResponse getById(Long id);
 
-    List<TodoResponse> getAll();
-
-    List<TodoResponse> getAll(Boolean completed);
-
-    List<TodoResponse> getAll(Boolean completed, String title);
+    Page<TodoResponse> getPageable(Boolean completed,
+                                   String title,
+                                   LocalDateTime createdAtFrom,
+                                   LocalDateTime createdAtTo,
+                                   Pageable pageable);
 }

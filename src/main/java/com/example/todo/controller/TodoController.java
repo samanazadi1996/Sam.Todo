@@ -4,17 +4,28 @@ import com.example.todo.config.OpenApiConfig;
 import com.example.todo.dto.TodoCreateRequest;
 import com.example.todo.dto.TodoResponse;
 import com.example.todo.dto.TodoUpdateRequest;
+import com.example.todo.entity.TodoItem;
 import com.example.todo.service.TodoItemService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.awt.print.Pageable;
+import java.time.LocalDateTime;
 import java.util.List;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 @RestController
 @RequestMapping("/api/todos")
@@ -59,9 +70,27 @@ public class TodoController {
 
     @GetMapping
     @Operation(summary = "دریافت همه وظایف")
-    public ResponseEntity<List<TodoResponse>> getAll(
+    public Page<TodoResponse> list(
             @RequestParam(required = false) Boolean completed,
-            @RequestParam(required = false) String title) {
-        return ResponseEntity.ok(todoItemService.getAll(completed, title));
+            @RequestParam(required = false) String title,
+
+            @RequestParam(required = false)
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
+            LocalDateTime createdAtFrom,
+
+            @RequestParam(required = false)
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
+            LocalDateTime createdAtTo,
+
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+
+        return todoItemService.getPageable(
+                completed,
+                title,
+                createdAtFrom,
+                createdAtTo,
+                PageRequest.of(page, size)
+        );
     }
 }
